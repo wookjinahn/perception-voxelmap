@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>Voxelmap</name>
+  <version>1.0.0</version>
+  <description>Meta-package for perception-voxelmap package.</description>
+
+  <maintainer email="wookjinahn5@pusan.ac.kr">wj</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>VoxelmapCore</exec_depend>
+  <exec_depend>VoxelmapDemos</exec_depend>
+
+  <export>
+    <metapackage />
+  </export>
+
+</package>

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>VoxelmapCore</name>
+  <version>1.0.0</version>
+  <description>The perception-voxeltmap VoxelmapCore package</description>
+
+  <maintainer email="wookjinahn5@pusan.ac.kr">wj</maintainer>
+  <license>TODO</license>
+  <url type="website">https://github.com/wookjinAhn/perception-voxelmap</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>roscpp</depend>
+  <depend>camel-euclid-vector</depend>
+
+  <test_depend>gtest</test_depend>
+</package>
