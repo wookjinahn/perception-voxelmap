@@ -17,12 +17,19 @@ namespace voxelmapcore
         mCellCount = static_cast<int>(dataRange.GetW() / mResolution);
 
         float dataRangeWidth = mCellCount * mResolution;
-        mDataRange = BoundingBox(dataRange.GetX(), dataRange.GetY(), dataRangeWidth, dataRangeWidth);
+        mDataRange = BoundingBox(dataRange.GetX(), dataRange.GetY(), dataRange.GetZ(), dataRangeWidth);
 
-        mCurrentMatrixData = new float* [mCellCount * 2];
+        mCurrentMatrixData = new float** [mCellCount * 2];
+        mPastMatrixData = new float** [mCellCount * 2];
         for (int i = 0; i < mCellCount * 2; i++)
         {
-            mCurrentMatrixData[i] = new float[mCellCount * 2];
+            mCurrentMatrixData[i] = new float* [mCellCount * 2];
+            mPastMatrixData[i] = new float* [mCellCount * 2];
+            for (int j = 0; i < mCellCount * 2; j++)
+            {
+                mCurrentMatrixData[i][j] = new float[mCellCount * 2];
+                mPastMatrixData[i][j] = new float[mCellCount * 2];
+            }
         }
     }
 
@@ -33,56 +40,73 @@ namespace voxelmapcore
      * @param dataRangeWidth
      * @param resolution
      */
-    Voxelmap::Voxelmap(float dataRangeX, float dataRangeY, float dataRangeWidth, float resolution)
+    Voxelmap::Voxelmap(float dataRangeX, float dataRangeY, float dataRangeZ, float dataRangeWidth, float resolution)
         : mResolution(resolution)
     {
+        std::cout << "[ Constructor ]" << std::endl;
         mCellCount = static_cast<int>(dataRangeWidth / mResolution);
-
+        std::cout << "mCellCount : " << mCellCount << std::endl;
         dataRangeWidth = mCellCount * resolution;
-        mDataRange = BoundingBox(dataRangeX, dataRangeY, dataRangeWidth, dataRangeWidth);
+        std::cout << "dataRangeWidth : " << dataRangeWidth << std::endl;
 
-        mCurrentMatrixData = new float* [mCellCount * 2];
-        mPastMatrixData = new float* [mCellCount * 2];
+        mDataRange = BoundingBox(dataRangeX, dataRangeY, dataRangeZ, dataRangeWidth);
+
+        mCurrentMatrixData = new float** [mCellCount * 2];
+        mPastMatrixData = new float** [mCellCount * 2];
         for (int i = 0; i < mCellCount * 2; i++)
         {
-            mCurrentMatrixData[i] = new float[mCellCount * 2];
-            mPastMatrixData[i] = new float[mCellCount * 2];
+            mCurrentMatrixData[i] = new float* [mCellCount * 2];
+            mPastMatrixData[i] = new float* [mCellCount * 2];
+            for (int j = 0; j < mCellCount * 2; j++)
+            {
+                mCurrentMatrixData[i][j] = new float[mCellCount * 2];
+                mPastMatrixData[i][j] = new float[mCellCount * 2];
+            }
         }
+        std::cout << "[ Constructor End ]" << std::endl;
     }
 
-    Voxelmap::Voxelmap(float dataRangeX, float dataRangeY, float dataRangeWidth, float resolution, float cameraPositionX, float cameraPositionY, float cameraPositionZ)
+    Voxelmap::Voxelmap(float dataRangeX, float dataRangeY, float dataRangeZ, float dataRangeWidth, float resolution, float cameraPositionX, float cameraPositionY, float cameraPositionZ)
         : mResolution(resolution)
     {
+        std::cout << "[ Constructor ]" << std::endl;
         mCellCount = static_cast<int>(dataRangeWidth / mResolution);
 
         dataRangeWidth = mCellCount * resolution;
-        mDataRange = BoundingBox(dataRangeX, dataRangeY, dataRangeWidth, dataRangeWidth);
+        mDataRange = BoundingBox(dataRangeX, dataRangeY, dataRangeZ, dataRangeWidth);
 
-        mCurrentMatrixData = new float* [mCellCount * 2];
-        mPastMatrixData = new float* [mCellCount * 2];
+        mCurrentMatrixData = new float** [mCellCount * 2];
+        mPastMatrixData = new float** [mCellCount * 2];
         for (int i = 0; i < mCellCount * 2; i++)
         {
-            mCurrentMatrixData[i] = new float[mCellCount * 2];
-            mPastMatrixData[i] = new float[mCellCount * 2];
+            mCurrentMatrixData[i] = new float* [mCellCount * 2];
+            mPastMatrixData[i] = new float* [mCellCount * 2];
+            for (int j = 0; j < mCellCount * 2; j++)
+            {
+                mCurrentMatrixData[i][j] = new float[mCellCount * 2];
+                mPastMatrixData[i][j] = new float[mCellCount * 2];
+            }
         }
 
         mCameraPosition[0] = cameraPositionX;
         mCameraPosition[1] = cameraPositionY;
         mCameraPosition[2] = cameraPositionZ;
+        std::cout << "[ Constructor End ]" << std::endl;
     }
 
     Voxelmap::~Voxelmap()
     {
-        for (int i = 0; i < mCellCount; i++)
+        for (int i = 0; i < mCellCount * 2; i++)
         {
+            for (int j = 0; j < mCellCount * 2; j++)
+            {
+                delete[] mCurrentMatrixData[i][j];
+                delete[] mPastMatrixData[i][j];
+            }
             delete[] mCurrentMatrixData[i];
-        }
-        delete[] mCurrentMatrixData;
-
-        for (int i = 0; i < mCellCount; i++)
-        {
             delete[] mPastMatrixData[i];
         }
+        delete[] mCurrentMatrixData;
         delete[] mPastMatrixData;
     }
 
@@ -94,7 +118,7 @@ namespace voxelmapcore
     void Voxelmap::SetDefaultCameraPosition(float t265PoseZ, float d435PoseX, float d435PoseY, float d435PoseZ)
     {
         mCameraPosition[0] = t265PoseZ;
-        mCameraPosition[1] = mResolution;
+        mCameraPosition[1] = d435PoseX;
         mCameraPosition[2] = d435PoseY;
         mCameraPosition[3] = d435PoseZ;
     }
@@ -242,24 +266,23 @@ namespace voxelmapcore
         std::cout << "[ ToPointCloud2Msgs End ] mProcessedData size : " << mProcessedData.size() << "\n" << std::endl;
     }
 
-    void Voxelmap::ToHeightmapMSgs(std::string frame_id, HeightmapMsgs::Heightmap& outHeightmapMsgs)
+    void Voxelmap::ToVoxelmapMSgs(std::string frame_id, sensor_msgs::PointCloud2& outVoxelmapMsgs)
     {
         std::cout << "[ ToHeightmapMSgs ]" << std::endl;
-        visualizeAtToHeightmapMsgs();
+        sensor_msgs::PointCloud pointcloud_msgs;
 
-        outHeightmapMsgs.header.frame_id = frame_id;
-        outHeightmapMsgs.header.stamp = ros::Time::now();
-        outHeightmapMsgs.resolution = mResolution;
-        outHeightmapMsgs.points.resize(mProcessedData.size());
+        pointcloud_msgs.header.frame_id = frame_id;
+        pointcloud_msgs.header.stamp = ros::Time::now();
+        pointcloud_msgs.points.resize(mProcessedData.size());
 
-        for (int i = 0; i < outHeightmapMsgs.points.size(); i++)
+        for (int i = 0; i < pointcloud_msgs.points.size(); i++)
         {
             Point3 outData = mProcessedData[i];
-            outHeightmapMsgs.points[i].x = outData.GetX();
-            outHeightmapMsgs.points[i].y = outData.GetY() - (mCameraPosition[0]);
-//            outHeightmapMsgs.points[i].y = outData.GetY();
-            outHeightmapMsgs.points[i].z = outData.GetZ();
+            pointcloud_msgs.points[i].x = outData.GetX();
+            pointcloud_msgs.points[i].y = outData.GetY();
+            pointcloud_msgs.points[i].z = outData.GetZ();
         }
+        sensor_msgs::convertPointCloudToPointCloud2(pointcloud_msgs, outVoxelmapMsgs);
         std::cout << "[ ToHeightmapMSgs End ] mProcessedData size : " << mProcessedData.size() << "\n" << std::endl;
     }
 
@@ -393,8 +416,11 @@ namespace voxelmapcore
         {
             for (int j = 0; j < mCellCount * 2; j++)
             {
-                mCurrentMatrixData[i][j] = -10.0f;
-                mPastMatrixData[i][j] = -10.0f;
+                for (int k = 0; k < mCellCount * 2; k++)
+                {
+                    mCurrentMatrixData[i][j][k] = -100.0f;
+                    mPastMatrixData[i][j][k] = -100.0f;
+                }
             }
         }
         std::cout << "[ initializeMap End ]" << std::endl;
@@ -410,6 +436,7 @@ namespace voxelmapcore
             {
                 int xIndex = static_cast<int>(pastData.GetX() / mResolution) + mCellCount - static_cast<int>(mCurrentOdom[0] / mResolution);
                 int yIndex = static_cast<int>(pastData.GetY() / mResolution) + mCellCount - static_cast<int>(mCurrentOdom[1] / mResolution);
+                int zIndex = static_cast<int>(pastData.GetZ() / mResolution) + mCellCount - static_cast<int>(mCurrentOdom[2] / mResolution);
 
                 if (xIndex >= mCellCount * 2)
                 {
@@ -419,11 +446,12 @@ namespace voxelmapcore
                 {
                     yIndex = mCellCount * 2 - 1;
                 }
-
-                if (mPastMatrixData[xIndex][yIndex] < pastData.GetZ())
+                if (zIndex >= mCellCount * 2)
                 {
-                    mPastMatrixData[xIndex][yIndex] = pastData.GetZ();
+                    zIndex = mCellCount * 2 - 1;
                 }
+
+                mPastMatrixData[xIndex][yIndex][zIndex] = 1;
             }
         }
 
@@ -433,6 +461,7 @@ namespace voxelmapcore
             {
                 int xIndex = static_cast<int>(currentData.GetX() / mResolution) + mCellCount - static_cast<int>(mCurrentOdom[0] / mResolution);
                 int yIndex = static_cast<int>(currentData.GetY() / mResolution) + mCellCount - static_cast<int>(mCurrentOdom[1] / mResolution);
+                int zIndex = static_cast<int>(currentData.GetZ() / mResolution) + mCellCount - static_cast<int>(mCurrentOdom[2] / mResolution);
 
                 if (xIndex >= mCellCount * 2)
                 {
@@ -442,11 +471,11 @@ namespace voxelmapcore
                 {
                     yIndex = mCellCount * 2 - 1;
                 }
-
-                if (mCurrentMatrixData[xIndex][yIndex] < currentData.GetZ())
+                if (zIndex >= mCellCount * 2)
                 {
-                    mCurrentMatrixData[xIndex][yIndex] = currentData.GetZ();
+                    zIndex = mCellCount * 2 - 1;
                 }
+                mCurrentMatrixData[xIndex][yIndex][zIndex] = 1;
             }
         }
         std::cout << "[ insertDataToEachCell End ]" << std::endl;
@@ -458,9 +487,12 @@ namespace voxelmapcore
         {
             for (int j = 0; j < mCellCount * 2; j++)
             {
-                if (mCurrentMatrixData[i][j] != -10)
+                for (int k = 0; k < mCellCount * 2; k++)
                 {
-                    mPastMatrixData[i][j] = mCurrentMatrixData[i][j];
+                    if (mCurrentMatrixData[i][j][k] != -100.0f)
+                    {
+                        mPastMatrixData[i][j][k] = mCurrentMatrixData[i][j][k];
+                    }
                 }
             }
         }
@@ -474,28 +506,30 @@ namespace voxelmapcore
         {
             for (int j = 0; j < mCellCount * 2; j++)
             {
-                float x = static_cast<float>(i + static_cast<int>(mCurrentOdom[0] / mResolution) - mCellCount) * mResolution;
-                float y = static_cast<float>(j + static_cast<int>(mCurrentOdom[1] / mResolution) - mCellCount) * mResolution;
-                float z = -mCameraPosition[0];
-                if (mPastMatrixData[i][j] != -10)
+                for (int k = 0; k < mCellCount * 2; k++)
                 {
-                    z = mPastMatrixData[i][j];
-                }
+                    float x = static_cast<float>(i + static_cast<int>(mCurrentOdom[0] / mResolution) - mCellCount) * mResolution;
+                    float y = static_cast<float>(j + static_cast<int>(mCurrentOdom[1] / mResolution) - mCellCount) * mResolution;
+                    float z = static_cast<float>(k + static_cast<int>(mCurrentOdom[2] / mResolution) - mCellCount) * mResolution;;
 
-                Point3 point(x, y, z);
-                mProcessedData.push_back(point);
+                    if (mPastMatrixData[i][j][k] != -100.0f)
+                    {
+                        Point3 point(x, y, z);
+                        mProcessedData.push_back(point);
+                    }
+                }
             }
         }
 
         std::cout << "[ convertMapToVector End ]" << std::endl;
     }
 
-    void Voxelmap::visualizeAtToHeightmapMsgs()
+    void Voxelmap::visualizeAtToVoxelmapMsgs()
     {
-        std::cout << "[ visualizeAtToHeightmapMsgs ]" << std::endl;
+        std::cout << "[ visualizeAtToVoxelmapMsgs ]" << std::endl;
 
         changeDataCoordinateTo(mProcessedData, eCoordinate::CAMERA);
 
-        std::cout << "[ visualizeAtToHeightmapMsgs End ]" << "\n" << std::endl;
+        std::cout << "[ visualizeAtToVoxelmapMsgs End ]" << "\n" << std::endl;
     }
 }

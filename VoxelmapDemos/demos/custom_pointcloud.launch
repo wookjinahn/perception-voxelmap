@@ -54,15 +54,13 @@
       <arg name="depth_height"          value="$(arg depth_height)"/>
       <arg name="depth_fps"             value="$(arg depth_fps)"/>
       <arg name="clip_distance"         value="$(arg clip_distance)"/>
-      <arg name="allow_no_texture_points"  	default="true"/>		<!-- for using depth fov. not image -->
+      <!--<arg name="allow_no_texture_points"  	default="true"/>-->		<!-- for using depth fov. not image -->
       <arg name="filters"               default="pointcloud,disparity,spatial,temporal,decimation"/>
     </include>
   </group>
 
   <!--<node pkg="tf" type="static_transform_publisher" name="map" args="0 0 0 0 0 0 1 map my_frame 100" />-->
-  <!--<node pkg="tf" type="static_transform_publisher" name="map_to_t265" args="0 0 0.39 0 0 0 map /$(arg tf_prefix_camera1)_odom_frame 100"/>-->	<!-- two neo box -->
-  <!--<node pkg="tf" type="static_transform_publisher" name="map_to_t265" args="0 0 0.195 0 0 0 map /$(arg tf_prefix_camera1)_odom_frame 100"/>-->	<!-- A1 on neo box -->
-  <node pkg="tf" type="static_transform_publisher" name="map_to_t265" args="0 0 0.08 0 0 0 map /$(arg tf_prefix_camera1)_odom_frame 100"/>	<!-- real A1 -->
+  <node pkg="tf" type="static_transform_publisher" name="map_to_t265" args="0 0 0.95 0 0 0 map /$(arg tf_prefix_camera1)_odom_frame 100"/>	<!-- real A1 -->
   <node pkg="tf" type="static_transform_publisher" name="t265_to_d435" args="0 0 0.03 0 0.3263766 0 /$(arg tf_prefix_camera1)_link /$(arg tf_prefix_camera2)_link 100"/>
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find HeightmapDemos)/demos/custom_pointcloud.rviz" required="true" />

@@ -38,8 +38,8 @@ namespace voxelmapcore
     {
     public:
         Voxelmap(BoundingBox dataRange, float resolution);
-        Voxelmap(float dataRangeX, float dataRangeY, float dataRangeWidth, float resolution);
-        Voxelmap(float dataRangeX, float dataRangeY, float dataRangeWidth, float resolution, float cameraPositionX, float cameraPositionY, float cameraPositionZ);
+        Voxelmap(float dataRangeX, float dataRangeY, float dataRangeZ, float dataRangeWidth, float resolution);
+        Voxelmap(float dataRangeX, float dataRangeY, float dataRangeZ, float dataRangeWidth, float resolution, float cameraPositionX, float cameraPositionY, float cameraPositionZ);
         ~Voxelmap();
 
         void SetDataRage(const BoundingBox& dataRange);
@@ -53,7 +53,7 @@ namespace voxelmapcore
         void ToPCD(const std::string& filePath);
         void FromPointCloud2Msgs(sensor_msgs::PointCloud2 pointcloud2Msgs);
         void ToPointCloud2Msgs(const std::string& frame_id, sensor_msgs::PointCloud2& outPointCloud2);
-        void ToHeightmapMSgs(std::string frame_id, HeightmapMsgs::Heightmap& outHeightmapMsgs);
+        void ToVoxelmapMSgs(std::string frame_id, sensor_msgs::PointCloud2& outVoxelmapMsgs);
 
         void Process();
     private:
@@ -64,7 +64,7 @@ namespace voxelmapcore
         void insertDataToEachCell();
         void combinePastAndCurrent();
         void convertMapToVector();
-        void visualizeAtToHeightmapMsgs();
+        void visualizeAtToVoxelmapMsgs();
 
     private:
         std::vector<Point3> mCurrentData;
@@ -73,8 +73,8 @@ namespace voxelmapcore
 
         float mCurrentOdom[7];
 
-        float** mCurrentMatrixData;
-        float** mPastMatrixData;
+        float*** mCurrentMatrixData;
+        float*** mPastMatrixData;
 
         float mCameraPosition[4];
         BoundingBox mDataRange;
